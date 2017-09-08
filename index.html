@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+
+<head>
+    <script type="text/javascript" src="d3.min.js"></script>
+</head>
+
+<body>
+    <h1>Marriage rates in 2009.</h1>
+    <script type="text/javascript">
+    var callBackError;
+    var callBackData;
+
+    var margin = {
+            top: 20,
+            right: 20,
+            bottom: 30,
+            left: 40
+        },
+        width = 960 - margin.left - margin.right,
+        height = 500 - margin.top - margin.bottom;
+
+    var svgViewPort = d3.select("body")
+        .append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom);
+
+    d3.csv("us2009.csv",
+        function(error, data) {
+            callBackError = error;
+            callBackData = data;
+        });
+    </script>
+</body>
