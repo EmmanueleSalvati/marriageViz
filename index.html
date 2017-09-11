@@ -24,10 +24,63 @@
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom);
 
-    d3.csv("us2009.csv",
-        function(error, data) {
-            callBackError = error;
-            callBackData = data;
-        });
+    var innerSvg = svgViewPort.append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    var xScale = d3.scale.ordinal()
+        .rangeRoundBands([0, width], .1);
+
+    var yScale = d3.scale.linear()
+        .range([height, 0]);
+
+    var xAxis = d3.svg.axis()
+        .scale(xScale)
+        .orient("bottom");
+
+    var yAxis = d3.svg.axis()
+        .scale(yScale)
+        .orient("left");
+
+    d3.csv("us2009.csv", function(error, data) {
+        callBackError = error;
+        callBackData = data;
+
+        rateToNum(callBackData);
+
+        // Set scales domains
+        xScale.domain(callBackData.map(function(d) {
+            return d.age;
+        }));
+        yScale.domain(d3.extent(callBackData, function(d) {
+            return d.rate;
+        }));
+
+        // Draw the axes
+        innerSvg.append("g")
+            .attr("transform", "translate(0," + height + ")")
+            .call(xAxis);
+
+        innerSvg.append("g")
+            .call(yAxis);
+
+        // Draw the bars
+        innerSvg.selectAll("rect")
+            .data(callBackData)
+            .enter()
+            .append("rect")
+            .attr("x", function(d) { return xScale(d.age); })
+            .attr("width", xScale.rangeBand())
+            .attr("y", function(d) { return yScale(d.rate); })
+            .attr("height", function(d) { return height - yScale(d.rate); });
+
+
+    });
+
+
+    function rateToNum(data) {
+        data.forEach(function(d) {
+            d.rate = +d.rate;
+        })
+    }
     </script>
 </body>
